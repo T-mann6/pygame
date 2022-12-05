@@ -16,14 +16,22 @@ class Game():
        self.new()
     def new(self): # ny runde, kjører f. eks. når vi dør
         self.all_sprites = pg.sprite.Group()
+        self.pokemon = pg.sprite.Group()
         self.enemies = pg.sprite.Group()
-        self.hero = Player()
+        self.red = Player()
         self.mewtwo = Mewtwo()
-        self.all_sprites.add(self.hero, self.mewtwo)
-        self.enemies.add(self.mewtwo)
+        self.giovanni = Giovanni()
+        self.all_sprites.add(self.red, self.mewtwo, self.giovanni)
+        self.pokemon.add(self.mewtwo)
+        self.enemies.add(self.giovanni)
         self.i=0
-        self.hero.caught = 0
-        self.Pokemon_caught = self.comic_sans30.render("Pokémon caught: " + str(self.hero.caught), False, self.WHITE)
+        self.red.caught = 0
+        self.giovanni.caught = 0
+        self.red_caught = self.comic_sans30.render("Pokémon caught: " + str(self.red.caught), False, self.WHITE)
+        self.enemy_caught = self.comic_sans30.render("Pokémon caught: " + str(self.giovanni.caught), False, self.WHITE)
+        self.start.over = False
+        if self.start.over:
+            self.game_over_loop()
         self.run()
     def run(self): # mens vi spiller, game loop er her
         playing = True
@@ -37,18 +45,46 @@ class Game():
                         self.new()
             self.screen.blit(self.BG,(self.i,0))# tegner bakgrunn
             self.all_sprites.update()
-            hits = pg.sprite.spritecollide(self.hero, self.enemies, True)
-            if hits:
-                self.hero.caught += 1
-                self.Pokemon_caught = self.comic_sans30.render("Pokémon caught: " + str(self.hero.caught), False, self.WHITE)
-                if self.hero.caught >= 150:
+            hero_hits = pg.sprite.spritecollide(self.red, self.pokemon, True)
+            if hero_hits:
+                self.red.caught += 1
+                self.red_caught = self.comic_sans30.render("Pokémon caught: " + str(self.red.caught), False, self.WHITE)
+                if self.red.caught >= 150:
                     self.new()
-            if len(self.enemies) < 1:
+            giovanni_hits = pg.sprite.spritecollide(self.giovanni, self.pokemon, True)
+            if giovanni_hits:
+                self.giovanni.caught += 1
+                self.enemy_caught = self.comic_sans30.render("Pokémon caught: " + str(self.giovanni.caught), False, self.WHITE)
+                if self.giovanni.caught >= 150:
+                    self.new()
+
+            if len(self.pokemon) < 1:
                 self.mewtwo = Mewtwo()
                 self.all_sprites.add(self.mewtwo)
-                self.enemies.add(self.mewtwo)
-            self.screen.blit(self.Pokemon_caught,(10,10))
+                self.pokemon.add(self.mewtwo)
+            self.screen.blit(self.red_caught,(10,10))
+            self.screen.blit(self.enemy_caught,(700,10))
             self.all_sprites.draw(self.screen)
             pg.display.update()
+        
+        def game_over_loop(self):
+            self.game_over = True
+            while self.game_over:
+                self.clock.tick(self.FPS)
+                self.game_over_text=self.tekst_font.render("GAME                   OVER", False, (self.WHITE))
+                self.game_restart_text=self.comic_sans30.render("Press "Ctrl R" to restart", False, (self.WHITE))
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        self.game_over = False
+
+                    if event.type == pg.KEYDOWN: 
+                        if event.key == pg.K_r and pg.key.get_mods() & pg.KMOD_LCTRL:
+                            self.game_over = False
+
+                self.screen.blit(self.game_over_text, (self.WIDTH/2 - self.game_over_text.get_width()/2, 400))
+                self.screen.blit(self.game_restart_text, (self.WIDTH/2 - self.game_restart_text.get_width()/2, self.HEIGHT/2))
+                pg.display.update()
+
+        self.new()
 
 g = Game()
