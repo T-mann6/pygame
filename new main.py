@@ -5,6 +5,7 @@ class Game():
     def __init__(self): # kjører når vi starter spillet
        pg.init()
        self.WHITE = (255,255,255)
+       self.BLACK = (0,0,0)
        self.WIDTH = 1000
        self.HEIGHT = 1000
        self.screen = pg.display.set_mode((self.WIDTH,self.HEIGHT))
@@ -27,11 +28,14 @@ class Game():
         self.i=0
         self.red.caught = 0
         self.giovanni.caught = 0
-        self.red_caught = self.comic_sans30.render("Pokémon caught: " + str(self.red.caught), False, self.WHITE)
-        self.enemy_caught = self.comic_sans30.render("Pokémon caught: " + str(self.giovanni.caught), False, self.WHITE)
-        self.start.over = False
-        if self.start.over:
+        self.red_caught = self.comic_sans30.render("You caught: " + str(self.red.caught), False, self.WHITE)
+        self.enemy_caught = self.comic_sans30.render("Enemy caught: " + str(self.giovanni.caught), False, self.WHITE)
+        self.game_over = False
+        if self.game_over:
             self.game_over_loop()
+        self.You_Won = False
+        if self.You_Won:
+            self.You_Won_loop()
         self.run()
     def run(self): # mens vi spiller, game loop er her
         playing = True
@@ -48,15 +52,16 @@ class Game():
             hero_hits = pg.sprite.spritecollide(self.red, self.pokemon, True)
             if hero_hits:
                 self.red.caught += 1
-                self.red_caught = self.comic_sans30.render("Pokémon caught: " + str(self.red.caught), False, self.WHITE)
-                if self.red.caught >= 150:
-                    self.new()
+                self.red_caught = self.comic_sans30.render("You caught: " + str(self.red.caught), False, self.WHITE)
+                if self.red.caught >= 1:
+                    self.You_Won_loop()
+            
             giovanni_hits = pg.sprite.spritecollide(self.giovanni, self.pokemon, True)
             if giovanni_hits:
                 self.giovanni.caught += 1
-                self.enemy_caught = self.comic_sans30.render("Pokémon caught: " + str(self.giovanni.caught), False, self.WHITE)
+                self.enemy_caught = self.comic_sans30.render("Enemy caught: " + str(self.giovanni.caught), False, self.WHITE)
                 if self.giovanni.caught >= 150:
-                    self.new()
+                    self.game_over_loop()
 
             if len(self.pokemon) < 1:
                 self.mewtwo = Mewtwo()
@@ -67,23 +72,42 @@ class Game():
             self.all_sprites.draw(self.screen)
             pg.display.update()
         
-        def game_over_loop(self):
-            self.game_over = True
-            while self.game_over:
-                self.clock.tick(self.FPS)
-                self.game_over_text=self.tekst_font.render("GAME                   OVER", False, (self.WHITE))
-                self.game_restart_text=self.comic_sans30.render("Press "Ctrl R" to restart", False, (self.WHITE))
-                for event in pg.event.get():
-                    if event.type == pg.QUIT:
+    def game_over_loop(self):
+        self.game_over = True
+        while self.game_over:
+            self.clock.tick(self.FPS)
+            self.game_over_text=self.comic_sans30.render("GAME OVER, Too bad", False, self.BLACK)
+            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.BLACK)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.game_over = False
+
+                if event.type == pg.KEYDOWN: 
+                    if event.key == pg.K_r and pg.key.get_mods() & pg.KMOD_LCTRL:
                         self.game_over = False
 
-                    if event.type == pg.KEYDOWN: 
-                        if event.key == pg.K_r and pg.key.get_mods() & pg.KMOD_LCTRL:
-                            self.game_over = False
+            self.screen.blit(self.game_over_text, (self.WIDTH/2 - self.game_over_text.get_width()/2, 400))
+            self.screen.blit(self.game_restart_text, (self.WIDTH/2 - self.game_restart_text.get_width()/2, self.HEIGHT/2))
+            pg.display.update()
 
-                self.screen.blit(self.game_over_text, (self.WIDTH/2 - self.game_over_text.get_width()/2, 400))
-                self.screen.blit(self.game_restart_text, (self.WIDTH/2 - self.game_restart_text.get_width()/2, self.HEIGHT/2))
-                pg.display.update()
+        self.new()
+    
+    def You_Won_loop(self):
+        self.You_Won = True
+        while self.You_Won:
+            self.clock.tick(self.FPS)
+            self.game_over_text=self.comic_sans30.render("You beat Team Rocket, Congratulations", False, self.BLACK)
+            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.BLACK)
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    self.You_Won = False
+                if event.type == pg.KEYDOWN: 
+                    if event.key == pg.K_r and pg.key.get_mods() & pg.KMOD_LCTRL:
+                        self.You_Won = False
+
+            self.screen.blit(self.game_over_text, (self.WIDTH/2 - self.game_over_text.get_width()/2, 400))
+            self.screen.blit(self.game_restart_text, (self.WIDTH/2 - self.game_restart_text.get_width()/2, self.HEIGHT/2))
+            pg.display.update()
 
         self.new()
 
