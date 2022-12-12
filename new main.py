@@ -53,7 +53,7 @@ class Game():
             if hero_hits:
                 self.red.caught += 1
                 self.red_caught = self.comic_sans30.render("You caught: " + str(self.red.caught), False, self.WHITE)
-                if self.red.caught >= 1:
+                if self.red.caught >= 150:
                     self.You_Won_loop()
             
             giovanni_hits = pg.sprite.spritecollide(self.giovanni, self.pokemon, True)
@@ -76,8 +76,8 @@ class Game():
         self.game_over = True
         while self.game_over:
             self.clock.tick(self.FPS)
-            self.game_over_text=self.comic_sans30.render("GAME OVER, Too bad", False, self.BLACK)
-            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.BLACK)
+            self.game_over_text=self.comic_sans30.render("GAME OVER, Too bad", False, self.WHITE)
+            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.WHITE)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.game_over = False
@@ -96,8 +96,8 @@ class Game():
         self.You_Won = True
         while self.You_Won:
             self.clock.tick(self.FPS)
-            self.game_over_text=self.comic_sans30.render("You beat Team Rocket, Congratulations", False, self.BLACK)
-            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.BLACK)
+            self.game_over_text=self.comic_sans30.render("You beat Team Rocket, Congratulations", False, self.WHITE)
+            self.game_restart_text=self.comic_sans30.render("Want to try again, Press Ctrl R to restart", False, self.WHITE)
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.You_Won = False

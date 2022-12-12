@@ -53,7 +53,7 @@ class Giovanni(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.pos = vec(10,10)
         self.rect.center = self.pos
-        self.speed = 13
+        self.speed = 10
         self.caught = 0
     def update(self):
         self.rect.center = self.pos
